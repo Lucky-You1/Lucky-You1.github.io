@@ -180,7 +180,7 @@
         "好好吃饭呀 💓",
         "多喝温开水 💓",
         "天冷加件衣 💓",
-        "别熬夜啦 💓",
+        "别熬夜 💓",
         "记得吃水果 💓",
         "累了歇一歇 💓",
         "出门带伞哦 💓",
@@ -328,7 +328,7 @@
         }, 1200); // 与弹窗爆炸动画时长一致
       }
 
-      // 花朵烟花：中心直接爆炸，粒子为多瓣花朵形状（添加结束回调）
+      // 花朵烟花：中心直接爆炸，粒子为多瓣花朵形状（添加结束回调）- 减慢消失速度
       function startFlowerFireworks(onComplete) {
         const canvas = document.getElementById("fireworks");
         const ctx = canvas.getContext("2d");
@@ -337,16 +337,16 @@
         const flowers = [];
         let animationFrameId;
 
-        // 生成花朵粒子（中心爆炸，多波次）
+        // 生成花朵粒子（中心爆炸，多波次）- 减慢衰减速度，降低重力
         function createFlowers() {
           // 第一波：中心密集爆炸（250朵花）
-          for (let i = 0; i < 250; i++) {
+          for (let i = 0; i < 350; i++) {
             const angle = Math.random() * Math.PI * 2; // 360度随机方向
-            const speed = 2 + Math.random() * 5; // 随机速度
+            const speed = 1.5 + Math.random() * 4; // 降低初始速度（原2+5）
             const color =
               flowerColors[Math.floor(Math.random() * flowerColors.length)];
-            const size = 8 + Math.random() * 6; // 花朵大小（比花瓣大，更醒目）
-            const petalCount = 6 + Math.floor(Math.random() * 3); // 花瓣数量（6-8瓣，更真实）
+            const size = 8 + Math.random() * 6; // 花朵大小不变
+            const petalCount = 6 + Math.floor(Math.random() * 3); // 花瓣数量不变
 
             flowers.push({
               x: centerX,
@@ -355,10 +355,10 @@
               vy: Math.sin(angle) * speed,
               color: color,
               alpha: 1,
-              decay: 0.005 + Math.random() * 0.003, // 缓慢衰减，延长显示时间
+              decay: 0.002 + Math.random() * 0.0015, // 减慢衰减（原0.005+0.003），延长显示时间
               size: size,
               petalCount: petalCount,
-              rotateSpeed: (Math.random() - 0.5) * 0.02, // 随机旋转速度
+              rotateSpeed: (Math.random() - 0.5) * 0.01, // 减慢旋转速度（原0.02），更优雅
             });
           }
 
@@ -366,7 +366,7 @@
           setTimeout(() => {
             for (let i = 0; i < 150; i++) {
               const angle = Math.random() * Math.PI * 2;
-              const speed = 3 + Math.random() * 6;
+              const speed = 2 + Math.random() * 5; // 降低初始速度（原3+6）
               const color =
                 flowerColors[Math.floor(Math.random() * flowerColors.length)];
               const size = 7 + Math.random() * 5;
@@ -379,10 +379,10 @@
                 vy: Math.sin(angle) * speed,
                 color: color,
                 alpha: 0.9,
-                decay: 0.004 + Math.random() * 0.002,
+                decay: 0.0015 + Math.random() * 0.001, // 减慢衰减（原0.004+0.002）
                 size: size,
                 petalCount: petalCount,
-                rotateSpeed: (Math.random() - 0.5) * 0.02,
+                rotateSpeed: (Math.random() - 0.5) * 0.01, // 减慢旋转速度
               });
             }
           }, 300);
@@ -439,18 +439,18 @@
           ctx.restore();
         }
 
-        // 花朵动画循环（自然飘落效果）
+        // 花朵动画循环（自然飘落效果）- 减慢下落速度，延长动画时长
         function animateFlowers() {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
 
           flowers.forEach((flower, index) => {
-            // 花朵运动：添加重力+随机摆动，模拟自然飘落
-            flower.vy += 0.04; // 重力下落
-            flower.vx += (Math.random() - 0.5) * 0.05; // 左右轻微摆动
+            // 花朵运动：降低重力，减慢下落速度（原0.04）
+            flower.vy += 0.02; // 重力减半，下落更缓慢
+            flower.vx += (Math.random() - 0.5) * 0.03; // 减少左右摆动幅度（原0.05），更平稳
             flower.x += flower.vx;
             flower.y += flower.vy;
-            flower.alpha -= flower.decay;
-            flower.rotateAngle = (flower.rotateAngle || 0) + flower.rotateSpeed; // 持续旋转
+            flower.alpha -= flower.decay; // 衰减速度已减慢
+            flower.rotateAngle = (flower.rotateAngle || 0) + flower.rotateSpeed; // 旋转速度已减慢
 
             // 绘制花朵
             drawFlower(
@@ -464,13 +464,13 @@
               flower.rotateAngle
             );
 
-            // 移除消失的花朵
-            if (flower.alpha <= 0 || flower.y > canvas.height + flower.size) {
+            // 移除消失的花朵（增加底部阈值，让花朵多停留一会儿）
+            if (flower.alpha <= 0 || flower.y > canvas.height + flower.size * 2) {
               flowers.splice(index, 1);
             }
           });
 
-          // 持续动画直到所有花朵消失（总时长约10秒）
+          // 持续动画直到所有花朵消失（总时长约5秒，和爱心同步）
           if (flowers.length > 0) {
             animationFrameId = requestAnimationFrame(animateFlowers);
           } else {
@@ -489,14 +489,14 @@
           // 文字显示2秒后，开始消失并生成爱心
           setTimeout(() => {
             happyText.classList.add("fade-out");
-            generateHearts(); // 生成小爱心飘落
+            generateHearts(); // 生成小爱心飘落（和花朵同步）
           }, 2000);
         }, 1000);
       }
 
-      // 生成小爱心并自然飘落
+      // 生成小爱心并自然飘落（微调时长，和花朵同步）
       function generateHearts() {
-        const heartCount = 150; // 爱心数量，适配手机性能
+        const heartCount = 250; // 爱心数量不变
         const textRect = happyText.getBoundingClientRect();
         const textCenterX = textRect.left + textRect.width / 2;
         const textCenterY = textRect.top + textRect.height / 2;
@@ -519,15 +519,15 @@
 
           heartsContainer.appendChild(heart);
 
-          // 爱心动画：先显示，再自然飘落
+          // 爱心动画：先显示，再自然飘落（时长调整为4.5-6秒，和花朵呼应）
           setTimeout(() => {
             heart.style.opacity = "1"; // 渐显
 
-            // 飘落动画（重力+左右摆动+旋转）
-            const fallDuration = 3 + Math.random() * 2; // 飘落时长3-5秒
-            const swingAmplitude = 10 + Math.random() * 15; // 左右摆动幅度
+            // 飘落动画（微调参数，和花朵同步结束）
+            const fallDuration = 4.5 + Math.random() * 1.5; // 延长飘落时长（原3+2）
+            const swingAmplitude = 8 + Math.random() * 12; // 减少摆动幅度（原10+15），更平稳
             const rotateAngle = Math.random() * 360; // 随机旋转角度
-            const speedY = 10 + Math.random() * 8; // 下落速度
+            const speedY = 8 + Math.random() * 6; // 减慢下落速度（原10+8）
 
             let startTime = null;
             function animateHeart(timestamp) {
@@ -536,7 +536,7 @@
 
               if (progress < 1) {
                 // 左右摆动（正弦曲线）
-                const swing = Math.sin(progress * Math.PI * 4) * swingAmplitude;
+                const swing = Math.sin(progress * Math.PI * 3) * swingAmplitude; // 减少摆动频率（原4）
                 // 下落位置
                 const currentY = initY + progress * speedY * 20;
                 // 旋转
@@ -544,8 +544,8 @@
                 // 更新位置
                 heart.style.left = `${initX + swing}px`;
                 heart.style.top = `${currentY}px`;
-                // 逐渐透明
-                heart.style.opacity = `${1 - progress * 0.8}`;
+                // 逐渐透明（保持和花朵衰减节奏一致）
+                heart.style.opacity = `${1 - progress * 0.7}`;
 
                 requestAnimationFrame(animateHeart);
               } else {
@@ -570,15 +570,15 @@
         popups = [];
 
         // 生成100个弹窗（优化数量，避免手机卡顿）
-        const windowCount = 100;
+        const windowCount = 200;
         for (let i = 0; i < windowCount; i++) {
           setTimeout(() => {
             const popup = createPopup();
             popups.push(popup);
-          }, i * 100);
+          }, i * 70);
         }
 
-        const totalGenerateTime = windowCount * 100; // 10秒生成完所有弹窗
+        const totalGenerateTime = windowCount * 70; // 10秒生成完所有弹窗
         setTimeout(gatherPopups, totalGenerateTime + 800); // 生成后延迟0.8秒开始聚集
         setTimeout(syncExplode, totalGenerateTime + 800 + 1800); // 聚集1.8秒后，同步触发爆炸
       }
@@ -595,4 +595,3 @@
     </script>
   </body>
 </html>
-
