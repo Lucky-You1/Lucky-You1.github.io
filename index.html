@@ -340,7 +340,7 @@
         // 生成花朵粒子（中心爆炸，多波次）- 减慢衰减速度，降低重力
         function createFlowers() {
           // 第一波：中心密集爆炸（250朵花）
-          for (let i = 0; i < 350; i++) {
+          for (let i = 0; i < 250; i++) {
             const angle = Math.random() * Math.PI * 2; // 360度随机方向
             const speed = 1.5 + Math.random() * 4; // 降低初始速度（原2+5）
             const color =
@@ -496,7 +496,7 @@
 
       // 生成小爱心并自然飘落（微调时长，和花朵同步）
       function generateHearts() {
-        const heartCount = 250; // 爱心数量不变
+        const heartCount = 200; // 爱心数量不变
         const textRect = happyText.getBoundingClientRect();
         const textCenterX = textRect.left + textRect.width / 2;
         const textCenterY = textRect.top + textRect.height / 2;
@@ -570,7 +570,7 @@
         popups = [];
 
         // 生成100个弹窗（优化数量，避免手机卡顿）
-        const windowCount = 200;
+        const windowCount = 160;
         for (let i = 0; i < windowCount; i++) {
           setTimeout(() => {
             const popup = createPopup();
@@ -595,3 +595,4 @@
     </script>
   </body>
 </html>
+
