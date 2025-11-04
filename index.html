@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>💓 浪漫绽放</title>
+    <style>
+      /* 引导弹框 */
+      .guide-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 350px;
+        padding: 25px 20px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        z-index: 10000;
+        text-align: center;
+        box-sizing: border-box;
+      }
+      .guide-popup p {
+        font-family: "楷体", "KaiTi", serif;
+        font-size: 18px;
+        color: #333;
+        margin: 0 0 20px 0;
+        line-height: 1.5;
+      }
+      .guide-btn {
+        padding: 15px 45px;
+        background: #ff8ba7;
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        font-family: "楷体", "KaiTi", serif;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s;
+        width: 80%;
+        max-width: 220px;
+        box-sizing: border-box;
+        display: block;
+        margin: 0 auto;
+      }
+      .guide-btn:active {
+        background: #ff6b8f;
+        transform: scale(0.98);
+      }
+
+      /* 关心弹窗样式 */
+      .popup {
+        position: fixed;
+        padding: 15px 20px;
+        border-radius: 12px;
+        font-family: "楷体", "KaiTi", serif;
+        font-size: 16px;
+        color: #333;
+        z-index: 9999;
+        box-sizing: border-box;
+        transition: all 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); /* 爆炸动画更快更猛 */
+      }
+      .popup.gather {
+        transform: scale(0.3);
+        opacity: 0.8;
+        transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* 聚集动画平滑 */
+      }
+      .popup.explode {
+        transform: scale(1.8) translate(var(--x, 0), var(--y, 0));
+        opacity: 0;
+      }
+
+      /* 烟花容器 */
+      #fireworks {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10002;
+        pointer-events: none;
+      }
+
+      /* 小男孩抱花场景（默认隐藏） */
+      .boy-scene {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10003;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.5s ease;
+      }
+      .boy-scene.show {
+        opacity: 1;
+      }
+      .boy-img {
+        width: 180px;
+        height: auto;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .boy-text {
+        font-family: "楷体", "KaiTi", serif;
+        font-size: 24px;
+        color: #ff6b8f;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 10px 30px;
+        border-radius: 50px;
+        box-shadow: 0 3px 10px rgba(255, 107, 143, 0.3);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 0.9;
+          transform: scale(1);
+        }
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #fff;
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 引导弹框 -->
+    <div class="guide-popup" id="guidePopup">
+      <p>准备好开始浪漫之旅了吗？</p>
+      <button class="guide-btn" id="startBtn">准备好了！</button>
+    </div>
+    <!-- 烟花画布 -->
+    <canvas id="fireworks"></canvas>
+    <!-- 小男孩抱花场景（默认隐藏） -->
+    <div class="boy-scene" id="boyScene">
+      <div class="boy-text">要开心呀！</div>
+    </div>
+
+    <script>
+      const baseTips = [
+        "好好吃饭呀",
+        "多喝温开水",
+        "天冷加件衣",
+        "别熬夜啦",
+        "记得吃水果",
+        "累了歇一歇",
+        "出门带伞哦",
+        "早点休息吧",
+        "按时吃早餐",
+        "少看会儿手机",
+        "走路慢点呀",
+        "睡前泡泡脚",
+        "别吃太凉的",
+        "保持好心情",
+        "工作别太累",
+        "多出去走走",
+        "记得涂防晒",
+        "饭要趁热吃",
+        "别给自己压力",
+        "天冷穿袜子",
+        "多吃蔬菜呀",
+        "早点回家哦",
+        "别久坐呀",
+        "笑一笑呀",
+        "注意保暖呀",
+        "别吃太辣啦",
+        "累了伸伸腰",
+        "睡前别玩手机",
+        "记得午休哦",
+        "要保持好心情",
+      ];
+      const bgColors = [
+        "lightpink",
+        "skyblue",
+        "lightgreen",
+        "lavender",
+        "lightyellow",
+        "plum",
+        "coral",
+        "bisque",
+        "aquamarine",
+        "mistyrose",
+        "honeydew",
+      ];
+      // 花朵颜色（更鲜艳，多色系搭配）
+      const flowerColors = [
+        // 粉色系
+        { main: "#ff8ba7", petal: "#ff6b8f", center: "#ff4d79" },
+        { main: "#ffb6c1", petal: "#ff9aa2", center: "#ff7b7b" },
+        // 蓝色系
+        { main: "#87ceeb", petal: "#64b5f6", center: "#42a5f5" },
+        { main: "#b3e0ff", petal: "#91d5ff", center: "#64b5f6" },
+        // 黄色系
+        { main: "#fff3e0", petal: "#ffe0b2", center: "#ffcc80" },
+        { main: "#fff9c4", petal: "#fff59d", center: "#ffee58" },
+        // 紫色系
+        { main: "#e1bee7", petal: "#ce93d8", center: "#ba68c8" },
+        { main: "#f3e5f5", petal: "#e1bee7", center: "#d1c4e9" },
+        // 红色系
+        { main: "#ffcdcd", petal: "#ff9e9e", center: "#ff6e6e" },
+        { main: "#ffb3ba", petal: "#ff8a95", center: "#ff5e6c" },
+      ];
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      let popups = [];
+      const boyScene = document.getElementById("boyScene");
+
+      // 预加载小男孩图片
+      function preloadBoyImage() {
+        const img = new Image();
+        img.src =
+          "https://cdn.staticaly.com/gh/liyupi/pic-lib/blob/main/boy-hold-flower.png";
+      }
+      window.addEventListener("load", preloadBoyImage);
+
+      // 生成单个弹窗
+      function createPopup() {
+        const popup = document.createElement("div");
+        popup.className = "popup";
+        popup.textContent =
+          baseTips[Math.floor(Math.random() * baseTips.length)];
+        popup.style.backgroundColor =
+          bgColors[Math.floor(Math.random() * bgColors.length)];
+
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const popupWidth = 140;
+        const popupHeight = 55;
+        const x = Math.random() * (screenWidth - popupWidth);
+        const y = Math.random() * (screenHeight - popupHeight);
+
+        popup.dataset.initX = x;
+        popup.dataset.initY = y;
+        popup.style.left = `${x}px`;
+        popup.style.top = `${y}px`;
+        popup.style.animation = "fadeIn 0.5s ease-out";
+
+        document.body.appendChild(popup);
+        return popup;
+      }
+
+      // 聚集动画：所有弹窗聚到中心
+      function gatherPopups() {
+        popups.forEach((popup) => {
+          popup.style.left = `${centerX - 70}px`; // 弹窗中心对齐屏幕中心
+          popup.style.top = `${centerY - 27.5}px`;
+          popup.classList.add("gather");
+        });
+      }
+
+      // 同步爆炸：弹窗+花朵烟花同一时间爆炸
+      function syncExplode() {
+        // 1. 弹窗爆炸（与烟花同时触发）
+        popups.forEach((popup) => {
+          const initX = parseFloat(popup.dataset.initX);
+          const initY = parseFloat(popup.dataset.initY);
+          // 计算从中心到初始位置的反向偏移（最大化爆炸扩散）
+          const offsetX = (initX - centerX + 70) * (1.2 + Math.random() * 0.8);
+          const offsetY =
+            (initY - centerY + 27.5) * (1.2 + Math.random() * 0.8);
+          popup.style.setProperty("--x", `${offsetX}px`);
+          popup.style.setProperty("--y", `${offsetY}px`);
+          popup.classList.remove("gather");
+          popup.classList.add("explode");
+        });
+
+        // 2. 花朵烟花爆炸（与弹窗爆炸同步启动）
+        startFlowerFireworks(() => {
+          // 花朵动画结束后，显示小男孩场景
+        });
+
+        // 3. 爆炸后清理弹窗
+        setTimeout(() => {
+          popups.forEach((popup) => popup.remove());
+          popups = [];
+        }, 1200); // 与弹窗爆炸动画时长一致
+      }
+
+      // 花朵烟花：中心直接爆炸，粒子为多瓣花朵形状（添加结束回调）
+      function startFlowerFireworks(onComplete) {
+        const canvas = document.getElementById("fireworks");
+        const ctx = canvas.getContext("2d");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const flowers = [];
+        let animationFrameId;
+
+        // 生成花朵粒子（中心爆炸，多波次）
+        function createFlowers() {
+          // 第一波：中心密集爆炸（250朵花）
+          for (let i = 0; i < 250; i++) {
+            const angle = Math.random() * Math.PI * 2; // 360度随机方向
+            const speed = 2 + Math.random() * 5; // 随机速度
+            const color =
+              flowerColors[Math.floor(Math.random() * flowerColors.length)];
+            const size = 8 + Math.random() * 6; // 花朵大小（比花瓣大，更醒目）
+            const petalCount = 6 + Math.floor(Math.random() * 3); // 花瓣数量（6-8瓣，更真实）
+
+            flowers.push({
+              x: centerX,
+              y: centerY,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              color: color,
+              alpha: 1,
+              decay: 0.005 + Math.random() * 0.003, // 缓慢衰减，延长显示时间
+              size: size,
+              petalCount: petalCount,
+              rotateSpeed: (Math.random() - 0.5) * 0.02, // 随机旋转速度
+            });
+          }
+
+          // 第二波：延迟300ms再炸一波（150朵花），爆炸范围更大
+          setTimeout(() => {
+            for (let i = 0; i < 150; i++) {
+              const angle = Math.random() * Math.PI * 2;
+              const speed = 3 + Math.random() * 6;
+              const color =
+                flowerColors[Math.floor(Math.random() * flowerColors.length)];
+              const size = 7 + Math.random() * 5;
+              const petalCount = 6 + Math.floor(Math.random() * 3);
+
+              flowers.push({
+                x: centerX,
+                y: centerY,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                color: color,
+                alpha: 0.9,
+                decay: 0.004 + Math.random() * 0.002,
+                size: size,
+                petalCount: petalCount,
+                rotateSpeed: (Math.random() - 0.5) * 0.02,
+              });
+            }
+          }, 300);
+        }
+
+        // 绘制多瓣花朵（核心优化：更逼真的花朵形态）
+        function drawFlower(
+          ctx,
+          x,
+          y,
+          size,
+          color,
+          alpha,
+          petalCount,
+          rotateAngle
+        ) {
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(rotateAngle); // 花朵旋转，更自然
+          ctx.globalAlpha = alpha;
+
+          const petalSize = size * 0.6; // 花瓣大小
+          const centerSize = size * 0.3; // 花蕊大小
+
+          // 绘制花瓣（多瓣环绕）
+          for (let i = 0; i < petalCount; i++) {
+            const angle = (i / petalCount) * Math.PI * 2;
+            ctx.save();
+            ctx.rotate(angle);
+
+            // 绘制单个花瓣（椭圆+圆弧，更饱满）
+            ctx.beginPath();
+            ctx.ellipse(
+              petalSize * 0.5,
+              0,
+              petalSize,
+              petalSize * 0.7,
+              0,
+              0,
+              Math.PI * 2
+            );
+            ctx.fillStyle = color.petal;
+            ctx.fill();
+
+            ctx.restore();
+          }
+
+          // 绘制花蕊（中心圆点，颜色更深）
+          ctx.beginPath();
+          ctx.arc(0, 0, centerSize, 0, Math.PI * 2);
+          ctx.fillStyle = color.center;
+          ctx.fill();
+
+          ctx.restore();
+        }
+
+        // 花朵动画循环（自然飘落效果）
+        function animateFlowers() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          flowers.forEach((flower, index) => {
+            // 花朵运动：添加重力+随机摆动，模拟自然飘落
+            flower.vy += 0.04; // 重力下落
+            flower.vx += (Math.random() - 0.5) * 0.05; // 左右轻微摆动
+            flower.x += flower.vx;
+            flower.y += flower.vy;
+            flower.alpha -= flower.decay;
+            flower.rotateAngle = (flower.rotateAngle || 0) + flower.rotateSpeed; // 持续旋转
+
+            // 绘制花朵
+            drawFlower(
+              ctx,
+              flower.x,
+              flower.y,
+              flower.size,
+              flower.color,
+              flower.alpha,
+              flower.petalCount,
+              flower.rotateAngle
+            );
+
+            // 移除消失的花朵
+            if (flower.alpha <= 0 || flower.y > canvas.height + flower.size) {
+              flowers.splice(index, 1);
+            }
+          });
+
+          // 持续动画直到所有花朵消失（总时长约10秒）
+          if (flowers.length > 0) {
+            animationFrameId = requestAnimationFrame(animateFlowers);
+          } else {
+            cancelAnimationFrame(animationFrameId);
+            setTimeout(() => {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              onComplete && onComplete(); // 花朵动画结束，执行回调显示小男孩
+            }, 500);
+          }
+        }
+
+        createFlowers();
+        animateFlowers();
+        setTimeout(()=>{
+        boyScene.classList.add("show");
+
+        },1000)
+      }
+
+      // 完整流程：引导→生成→聚集→同步爆炸→显示小男孩
+      function startPopup() {
+        document.getElementById("guidePopup").style.display = "none";
+        popups = [];
+
+        // 生成100个弹窗（优化数量，避免手机卡顿）
+        const windowCount = 100;
+        for (let i = 0; i < windowCount; i++) {
+          setTimeout(() => {
+            const popup = createPopup();
+            popups.push(popup);
+          }, i * 100);
+        }
+
+        const totalGenerateTime = windowCount * 100; // 10秒生成完所有弹窗
+        setTimeout(gatherPopups, totalGenerateTime + 800); // 生成后延迟0.8秒开始聚集
+        setTimeout(syncExplode, totalGenerateTime + 800 + 1800); // 聚集1.8秒后，同步触发爆炸
+      }
+
+      // 绑定按钮事件（确保手机端点击有效）
+      document.addEventListener("DOMContentLoaded", () => {
+        const startBtn = document.getElementById("startBtn");
+        startBtn.addEventListener("click", startPopup);
+        startBtn.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          startPopup();
+        });
+      });
+    </script>
+  </body>
+</html>
