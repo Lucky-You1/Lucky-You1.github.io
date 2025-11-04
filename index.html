@@ -32,13 +32,13 @@
         line-height: 1.5;
       }
       .guide-btn {
-        padding: 15px 45px;
+        padding: 10px 30px;
         background: #ff8ba7;
         color: #fff;
         border: none;
         border-radius: 30px;
         font-family: "楷体", "KaiTi", serif;
-        font-size: 18px;
+        font-size: 15px;
         cursor: pointer;
         transition: all 0.3s;
         width: 80%;
@@ -85,6 +85,17 @@
         pointer-events: none;
       }
 
+      /* 爱心容器（用于承载小爱心飘落动画） */
+      #hearts-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10004;
+        pointer-events: none;
+      }
+
       /* 小男孩抱花场景（默认隐藏） */
       .boy-scene {
         position: fixed;
@@ -119,6 +130,15 @@
         padding: 10px 30px;
         border-radius: 50px;
         box-shadow: 0 3px 10px rgba(255, 107, 143, 0.3);
+        transition: all 2s ease-out; /* 文字消失动画时长 */
+        position: relative;
+      }
+      /* 文字从上到下消失的效果 */
+      .boy-text.fade-out {
+        background: transparent;
+        box-shadow: none;
+        opacity: 0;
+        transform: translateY(50px); /* 向下移动一点再消失 */
       }
 
       @keyframes fadeIn {
@@ -144,47 +164,55 @@
     <!-- 引导弹框 -->
     <div class="guide-popup" id="guidePopup">
       <p>准备好开始浪漫之旅了吗？</p>
-      <button class="guide-btn" id="startBtn">准备好了！</button>
+      <button class="guide-btn" id="startBtn">让我们一起出发吧！</button>
     </div>
     <!-- 烟花画布 -->
     <canvas id="fireworks"></canvas>
+    <!-- 爱心容器 -->
+    <div id="hearts-container"></div>
     <!-- 小男孩抱花场景（默认隐藏） -->
     <div class="boy-scene" id="boyScene">
-      <div class="boy-text">要开心呀！</div>
+      <div class="boy-text" id="happyText">开心最重要！</div>
     </div>
 
     <script>
       const baseTips = [
-        "好好吃饭呀",
-        "多喝温开水",
-        "天冷加件衣",
-        "别熬夜啦",
-        "记得吃水果",
-        "累了歇一歇",
-        "出门带伞哦",
-        "早点休息吧",
-        "按时吃早餐",
-        "少看会儿手机",
-        "走路慢点呀",
-        "睡前泡泡脚",
-        "别吃太凉的",
-        "保持好心情",
-        "工作别太累",
-        "多出去走走",
-        "记得涂防晒",
-        "饭要趁热吃",
-        "别给自己压力",
-        "天冷穿袜子",
-        "多吃蔬菜呀",
-        "早点回家哦",
-        "别久坐呀",
-        "笑一笑呀",
-        "注意保暖呀",
-        "别吃太辣啦",
-        "累了伸伸腰",
-        "睡前别玩手机",
-        "记得午休哦",
-        "要保持好心情",
+        "好好吃饭呀 💓",
+        "多喝温开水 💓",
+        "天冷加件衣 💓",
+        "别熬夜啦 💓",
+        "记得吃水果 💓",
+        "累了歇一歇 💓",
+        "出门带伞哦 💓",
+        "早点休息吧 💓",
+        "按时吃早餐 💓",
+        "少看会儿手机 💓",
+        "走路慢点呀 💓",
+        "睡前泡泡脚 💓",
+        "别吃太凉的 💓",
+        "保持好心情 💓",
+        "工作别太累 💓",
+        "多出去走走 💓",
+        "记得涂防晒 💓",
+        "饭要趁热吃 💓",
+        "别给自己压力 💓",
+        "天冷穿袜子 💓",
+        "多吃蔬菜呀 💓",
+        "早点回家哦 💓",
+        "别久坐呀 💓",
+        "笑一笑呀 💓",
+        "注意保暖呀 💓",
+        "别吃太辣啦 💓",
+        "累了伸伸腰 💓",
+        "睡前别玩手机 💓",
+        "记得午休哦 💓",
+        "要保持好心情 💓",
+        "最美丽啦 💓",
+        "美得不可方物 💓",
+        "世界为你而转 💓",
+        "温柔 可爱 大方 💓",
+        "保持好心情 💓",
+        "温柔 可爱 大方 💓",
       ];
       const bgColors = [
         "lightpink",
@@ -217,10 +245,17 @@
         { main: "#ffcdcd", petal: "#ff9e9e", center: "#ff6e6e" },
         { main: "#ffb3ba", petal: "#ff8a95", center: "#ff5e6c" },
       ];
+      // 爱心颜色（和文字、花朵配色呼应）
+      const heartColors = [
+        "#ff8ba7", "#ff6b8f", "#ff4d79", "#ff9aa2", "#ff7b7b",
+        "#ffcdcd", "#ff9e9e", "#ff6e6e", "#ffb3ba", "#ff5e6c"
+      ];
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
       let popups = [];
       const boyScene = document.getElementById("boyScene");
+      const happyText = document.getElementById("happyText");
+      const heartsContainer = document.getElementById("hearts-container");
 
       // 预加载小男孩图片
       function preloadBoyImage() {
@@ -449,13 +484,87 @@
 
         createFlowers();
         animateFlowers();
-        setTimeout(()=>{
-        boyScene.classList.add("show");
-
-        },1000)
+        setTimeout(() => {
+          boyScene.classList.add("show");
+          // 文字显示2秒后，开始消失并生成爱心
+          setTimeout(() => {
+            happyText.classList.add("fade-out");
+            generateHearts(); // 生成小爱心飘落
+          }, 2000);
+        }, 1000);
       }
 
-      // 完整流程：引导→生成→聚集→同步爆炸→显示小男孩
+      // 生成小爱心并自然飘落
+      function generateHearts() {
+        const heartCount = 150; // 爱心数量，适配手机性能
+        const textRect = happyText.getBoundingClientRect();
+        const textCenterX = textRect.left + textRect.width / 2;
+        const textCenterY = textRect.top + textRect.height / 2;
+
+        // 生成单个爱心
+        function createHeart() {
+          const heart = document.createElement("div");
+          heart.style.position = "absolute";
+          heart.style.fontSize = `${8 + Math.random() * 6}px`; // 爱心大小随机
+          heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
+          heart.style.opacity = "0";
+          heart.style.transition = "opacity 0.5s ease";
+          heart.textContent = "💓"; // 爱心emoji，清晰不模糊
+
+          // 爱心初始位置：文字范围内随机
+          const initX = textCenterX - 50 + Math.random() * 100;
+          const initY = textCenterY - 20 + Math.random() * 40;
+          heart.style.left = `${initX}px`;
+          heart.style.top = `${initY}px`;
+
+          heartsContainer.appendChild(heart);
+
+          // 爱心动画：先显示，再自然飘落
+          setTimeout(() => {
+            heart.style.opacity = "1"; // 渐显
+
+            // 飘落动画（重力+左右摆动+旋转）
+            const fallDuration = 3 + Math.random() * 2; // 飘落时长3-5秒
+            const swingAmplitude = 10 + Math.random() * 15; // 左右摆动幅度
+            const rotateAngle = Math.random() * 360; // 随机旋转角度
+            const speedY = 10 + Math.random() * 8; // 下落速度
+
+            let startTime = null;
+            function animateHeart(timestamp) {
+              if (!startTime) startTime = timestamp;
+              const progress = (timestamp - startTime) / (fallDuration * 1000);
+
+              if (progress < 1) {
+                // 左右摆动（正弦曲线）
+                const swing = Math.sin(progress * Math.PI * 4) * swingAmplitude;
+                // 下落位置
+                const currentY = initY + progress * speedY * 20;
+                // 旋转
+                heart.style.transform = `rotate(${rotateAngle * progress}deg)`;
+                // 更新位置
+                heart.style.left = `${initX + swing}px`;
+                heart.style.top = `${currentY}px`;
+                // 逐渐透明
+                heart.style.opacity = `${1 - progress * 0.8}`;
+
+                requestAnimationFrame(animateHeart);
+              } else {
+                // 动画结束，移除爱心
+                heart.remove();
+              }
+            }
+
+            requestAnimationFrame(animateHeart);
+          }, Math.random() * 500); // 爱心分批出现，更自然
+        }
+
+        // 批量生成爱心
+        for (let i = 0; i < heartCount; i++) {
+          setTimeout(createHeart, i * 10);
+        }
+      }
+
+      // 完整流程：引导→生成→聚集→同步爆炸→显示小男孩→文字消失→爱心飘落
       function startPopup() {
         document.getElementById("guidePopup").style.display = "none";
         popups = [];
