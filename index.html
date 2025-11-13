@@ -1,598 +1,294 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>💓 Your gift</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💓  Your gift</title>
     <style>
-      /* 引导弹框 */
-      .guide-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        max-width: 350px;
-        padding: 25px 20px;
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-        z-index: 10000;
-        text-align: center;
-        box-sizing: border-box;
-      }
-      .guide-popup p {
-        font-family: "楷体", "KaiTi", serif;
-        font-size: 18px;
-        color: #333;
-        margin: 0 0 20px 0;
-        line-height: 1.5;
-      }
-      .guide-btn {
-        padding: 10px 30px;
-        background: #ff8ba7;
-        color: #fff;
-        border: none;
-        border-radius: 30px;
-        font-family: "楷体", "KaiTi", serif;
-        font-size: 15px;
-        cursor: pointer;
-        transition: all 0.3s;
-        width: 80%;
-        max-width: 220px;
-        box-sizing: border-box;
-        display: block;
-        margin: 0 auto;
-      }
-      .guide-btn:active {
-        background: #ff6b8f;
-        transform: scale(0.98);
-      }
-
-      /* 关心弹窗样式 */
-      .popup {
-        position: fixed;
-        padding: 15px 20px;
-        border-radius: 12px;
-        font-family: "楷体", "KaiTi", serif;
-        font-size: 16px;
-        color: #333;
-        z-index: 9999;
-        box-sizing: border-box;
-        transition: all 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); /* 爆炸动画更快更猛 */
-      }
-      .popup.gather {
-        transform: scale(0.3);
-        opacity: 0.8;
-        transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* 聚集动画平滑 */
-      }
-      .popup.explode {
-        transform: scale(1.8) translate(var(--x, 0), var(--y, 0));
-        opacity: 0;
-      }
-
-      /* 烟花容器 */
-      #fireworks {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10002;
-        pointer-events: none;
-      }
-
-      /* 爱心容器（用于承载小爱心飘落动画） */
-      #hearts-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10004;
-        pointer-events: none;
-      }
-
-      /* 小男孩抱花场景（默认隐藏） */
-      .boy-scene {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10003;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-        opacity: 0;
-        transition: opacity 1.5s ease;
-      }
-      .boy-scene.show {
-        opacity: 1;
-      }
-      .boy-img {
-        width: 180px;
-        height: auto;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      }
-      .boy-text {
-        font-family: "楷体", "KaiTi", serif;
-        font-size: 24px;
-        color: #ff6b8f;
-        background: rgba(255, 255, 255, 0.8);
-        padding: 10px 30px;
-        border-radius: 50px;
-        box-shadow: 0 3px 10px rgba(255, 107, 143, 0.3);
-        transition: all 2s ease-out; /* 文字消失动画时长 */
-        position: relative;
-      }
-      /* 文字从上到下消失的效果 */
-      .boy-text.fade-out {
-        background: transparent;
-        box-shadow: none;
-        opacity: 0;
-        transform: translateY(50px); /* 向下移动一点再消失 */
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: scale(0.8);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        to {
-          opacity: 0.9;
-          transform: scale(1);
+        
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #fff;
+            touch-action: manipulation;
+            font-family: "楷体", "KaiTi", serif;
+            height: 100vh;
+            width: 100vw;
         }
-      }
 
-      body {
-        margin: 0;
-        overflow: hidden;
-        background: #fff;
-        touch-action: manipulation;
-      }
+        /* 引导弹框 */
+        .guide-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 350px;
+            padding: 25px 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            z-index: 10000;
+            text-align: center;
+        }
+        .guide-popup p {
+            font-size: 18px;
+            color: #333;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+        .guide-btn {
+            padding: 10px 30px;
+            background: #ff8ba7;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 80%;
+            max-width: 220px;
+            display: block;
+            margin: 0 auto;
+        }
+        .guide-btn:active {
+            background: #ff6b8f;
+            transform: scale(0.98);
+        }
+
+        /* 卡片样式 - 初始较大 */
+        .popup {
+            position: fixed;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333;
+            z-index: 9999;
+            transition: all 2.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            white-space: nowrap;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* 爱心中心文字 */
+        .heart-center-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 22px;
+            color: #ff6b8f;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            z-index: 9998;
+            text-shadow: 0 2px 8px rgba(255, 107, 143, 0.3);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <!-- 引导弹框 -->
     <div class="guide-popup" id="guidePopup">
-      <p>准备好开始浪漫之旅了吗？</p>
-      <button class="guide-btn" id="startBtn">让我们一起出发吧！</button>
+        <p>你收到一份神秘礼物！确定打开吗？</p>
+        <button class="guide-btn" id="startBtn">确定！</button>
     </div>
-    <!-- 烟花画布 -->
-    <canvas id="fireworks"></canvas>
-    <!-- 爱心容器 -->
-    <div id="hearts-container"></div>
-    <!-- 小男孩抱花场景（默认隐藏） -->
-    <div class="boy-scene" id="boyScene">
-      <div class="boy-text" id="happyText">开心最重要！</div>
-    </div>
+
+    <!-- 爱心中心文字 -->
+    <div class="heart-center-text" id="heartCenterText"></div>
 
     <script>
-      const baseTips = [
-        "好好吃饭呀 💓",
-        "多喝温开水 💓",
-        "天冷加件衣 💓",
-        "别熬夜 💓",
-        "记得吃水果 💓",
-        "累了歇一歇 💓",
-        "出门带伞哦 💓",
-        "早点休息吧 💓",
-        "按时吃早餐 💓",
-        "少看会儿手机 💓",
-        "走路慢点呀 💓",
-        "睡前泡泡脚 💓",
-        "别吃太凉的 💓",
-        "保持好心情 💓",
-        "工作别太累 💓",
-        "多出去走走 💓",
-        "记得涂防晒 💓",
-        "饭要趁热吃 💓",
-        "别给自己压力 💓",
-        "天冷穿袜子 💓",
-        "多吃蔬菜呀 💓",
-        "早点回家哦 💓",
-        "别久坐呀 💓",
-        "笑一笑呀 💓",
-        "注意保暖呀 💓",
-        "别吃太辣啦 💓",
-        "累了伸伸腰 💓",
-        "睡前别玩手机 💓",
-        "记得午休哦 💓",
-        "要保持好心情 💓",
-        "最美丽啦 💓",
-        "美得不可方物 💓",
-        "世界为你而转 💓",
-        "温柔 可爱 大方 💓",
-        "保持好心情 💓",
-        "温柔 可爱 大方 💓",
-      ];
-      const bgColors = [
-        "lightpink",
-        "skyblue",
-        "lightgreen",
-        "lavender",
-        "lightyellow",
-        "plum",
-        "coral",
-        "bisque",
-        "aquamarine",
-        "mistyrose",
-        "honeydew",
-      ];
-      // 花朵颜色（更鲜艳，多色系搭配）
-      const flowerColors = [
-        // 粉色系
-        { main: "#ff8ba7", petal: "#ff6b8f", center: "#ff4d79" },
-        { main: "#ffb6c1", petal: "#ff9aa2", center: "#ff7b7b" },
-        // 蓝色系
-        { main: "#87ceeb", petal: "#64b5f6", center: "#42a5f5" },
-        { main: "#b3e0ff", petal: "#91d5ff", center: "#64b5f6" },
-        // 黄色系
-        { main: "#fff3e0", petal: "#ffe0b2", center: "#ffcc80" },
-        { main: "#fff9c4", petal: "#fff59d", center: "#ffee58" },
-        // 紫色系
-        { main: "#e1bee7", petal: "#ce93d8", center: "#ba68c8" },
-        { main: "#f3e5f5", petal: "#e1bee7", center: "#d1c4e9" },
-        // 红色系
-        { main: "#ffcdcd", petal: "#ff9e9e", center: "#ff6e6e" },
-        { main: "#ffb3ba", petal: "#ff8a95", center: "#ff5e6c" },
-      ];
-      // 爱心颜色（和文字、花朵配色呼应）
-      const heartColors = [
-        "#ff8ba7", "#ff6b8f", "#ff4d79", "#ff9aa2", "#ff7b7b",
-        "#ffcdcd", "#ff9e9e", "#ff6e6e", "#ffb3ba", "#ff5e6c"
-      ];
-      const centerX = window.innerWidth / 2;
-      const centerY = window.innerHeight / 2;
-      let popups = [];
-      const boyScene = document.getElementById("boyScene");
-      const happyText = document.getElementById("happyText");
-      const heartsContainer = document.getElementById("hearts-container");
+        const baseTips = [
+            "好好吃饭 💓",
+            "多喝温水 💓",
+            "天冷加衣 💓",
+            "别熬夜 💓",
+            "吃水果 💓",
+            "累了歇会 💓",
+            "出门带伞 💓",
+            "早点休息 💓",
+            "按时早餐 💓",
+            "少看手机 💓",
+            "走路慢点 💓",
+            "睡前泡脚 💓",
+            "别吃太凉 💓",
+            "保持开心 💓",
+            "工作别累 💓",
+            "多出去走 💓",
+            "记得防晒 💓",
+            "饭要趁热 💓",
+            "别给自己压力 💓",
+            "注意保暖 💓",
+        ];
+        
+        const bgColors = [
+            "lightpink",
+            "skyblue",
+            "lightgreen",
+            "lavender",
+            "lightyellow",
+            "plum",
+            "coral",
+            "bisque",
+            "aquamarine",
+            "mistyrose",
+        ];
+        
+        let centerX, centerY;
+        let popups = [];
+        const heartCenterText = document.getElementById("heartCenterText");
 
-      // 预加载小男孩图片
-      function preloadBoyImage() {
-        const img = new Image();
-        img.src =
-          "https://cdn.staticaly.com/gh/liyupi/pic-lib/blob/main/boy-hold-flower.png";
-      }
-      window.addEventListener("load", preloadBoyImage);
+        // 更新中心坐标
+        function updateCenter() {
+            centerX = window.innerWidth / 2;
+            centerY = window.innerHeight / 2;
+        }
 
-      // 生成单个弹窗
-      function createPopup() {
-        const popup = document.createElement("div");
-        popup.className = "popup";
-        popup.textContent =
-          baseTips[Math.floor(Math.random() * baseTips.length)];
-        popup.style.backgroundColor =
-          bgColors[Math.floor(Math.random() * bgColors.length)];
+        // 生成爱心坐标 - 放大爱心
+        function generateHeartPoints(count) {
+            const points = [];
+            // 根据屏幕大小调整爱心尺寸 - 放大爱心
+            const screenSize = Math.min(window.innerWidth, window.innerHeight);
+            const heartSize = screenSize * 0.25; // 增大爱心尺寸到25%
+            
+            // 生成爱心形状的坐标点
+            for (let t = 0; t < 2 * Math.PI; t += 2 * Math.PI / count) {
+                // 使用标准爱心方程
+                const x = 16 * Math.pow(Math.sin(t), 3);
+                const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                
+                // 缩放并居中 - 使用更大的爱心
+                const scaledX = centerX + x * heartSize / 16;
+                const scaledY = centerY - y * heartSize / 16;
+                
+                points.push({x: scaledX, y: scaledY});
+            }
+            
+            return points;
+        }
 
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const popupWidth = 140;
-        const popupHeight = 55;
-        const x = Math.random() * (screenWidth - popupWidth);
-        const y = Math.random() * (screenHeight - popupHeight);
+        // 生成卡片 - 初始较大
+        function createPopup() {
+            const popup = document.createElement("div");
+            popup.className = "popup";
+            popup.textContent = baseTips[Math.floor(Math.random() * baseTips.length)];
+            popup.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
-        popup.dataset.initX = x;
-        popup.dataset.initY = y;
-        popup.style.left = `${x}px`;
-        popup.style.top = `${y}px`;
-        popup.style.animation = "fadeIn 0.5s ease-out";
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const popupWidth = 90; // 初始较大的宽度
+            const popupHeight = 40; // 初始较大的高度
 
-        document.body.appendChild(popup);
-        return popup;
-      }
+            // 初始位置限制在屏幕内，避免超出
+            const x = Math.random() * (screenWidth - popupWidth - 60) + 30;
+            const y = Math.random() * (screenHeight - popupHeight - 60) + 30;
 
-      // 聚集动画：所有弹窗聚到中心
-      function gatherPopups() {
-        popups.forEach((popup) => {
-          popup.style.left = `${centerX - 70}px`; // 弹窗中心对齐屏幕中心
-          popup.style.top = `${centerY - 27.5}px`;
-          popup.classList.add("gather");
-        });
-      }
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+            popup.style.animation = "fadeIn 0.5s ease-out";
 
-      // 同步爆炸：弹窗+花朵烟花同一时间爆炸
-      function syncExplode() {
-        // 1. 弹窗爆炸（与烟花同时触发）
-        popups.forEach((popup) => {
-          const initX = parseFloat(popup.dataset.initX);
-          const initY = parseFloat(popup.dataset.initY);
-          // 计算从中心到初始位置的反向偏移（最大化爆炸扩散）
-          const offsetX = (initX - centerX + 70) * (1.2 + Math.random() * 0.8);
-          const offsetY =
-            (initY - centerY + 27.5) * (1.2 + Math.random() * 0.8);
-          popup.style.setProperty("--x", `${offsetX}px`);
-          popup.style.setProperty("--y", `${offsetY}px`);
-          popup.classList.remove("gather");
-          popup.classList.add("explode");
-        });
+            document.body.appendChild(popup);
+            return popup;
+        }
 
-        // 2. 花朵烟花爆炸（与弹窗爆炸同步启动）
-        startFlowerFireworks(() => {
-          // 花朵动画结束后，显示小男孩场景
-        });
+        // 汇聚到中心爱心 - 在汇聚时缩小卡片
+        function gatherToHeart() {
+            const heartPoints = generateHeartPoints(popups.length);
 
-        // 3. 爆炸后清理弹窗
-        setTimeout(() => {
-          popups.forEach((popup) => popup.remove());
-          popups = [];
-        }, 1200); // 与弹窗爆炸动画时长一致
-      }
-
-      // 花朵烟花：中心直接爆炸，粒子为多瓣花朵形状（添加结束回调）- 减慢消失速度
-      function startFlowerFireworks(onComplete) {
-        const canvas = document.getElementById("fireworks");
-        const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        const flowers = [];
-        let animationFrameId;
-
-        // 生成花朵粒子（中心爆炸，多波次）- 减慢衰减速度，降低重力
-        function createFlowers() {
-          // 第一波：中心密集爆炸（250朵花）
-          for (let i = 0; i < 250; i++) {
-            const angle = Math.random() * Math.PI * 2; // 360度随机方向
-            const speed = 1.5 + Math.random() * 4; // 降低初始速度（原2+5）
-            const color =
-              flowerColors[Math.floor(Math.random() * flowerColors.length)];
-            const size = 8 + Math.random() * 6; // 花朵大小不变
-            const petalCount = 6 + Math.floor(Math.random() * 3); // 花瓣数量不变
-
-            flowers.push({
-              x: centerX,
-              y: centerY,
-              vx: Math.cos(angle) * speed,
-              vy: Math.sin(angle) * speed,
-              color: color,
-              alpha: 1,
-              decay: 0.002 + Math.random() * 0.0015, // 减慢衰减（原0.005+0.003），延长显示时间
-              size: size,
-              petalCount: petalCount,
-              rotateSpeed: (Math.random() - 0.5) * 0.01, // 减慢旋转速度（原0.02），更优雅
+            popups.forEach((popup, index) => {
+                const targetPoint = heartPoints[index];
+                
+                // 依次汇聚，保持流畅感
+                setTimeout(() => {
+                    // 在移动到目标位置的同时缩小卡片
+                    popup.style.transition = 'all 2.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    popup.style.padding = '5px 8px';
+                    popup.style.fontSize = '9px';
+                    popup.style.borderRadius = '6px';
+                    popup.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                    
+                    // 计算缩小后的卡片尺寸
+                    const popupWidth = 60; // 缩小后的宽度
+                    const popupHeight = 25; // 缩小后的高度
+                    
+                    // 精准对齐中心爱心坐标
+                    const targetX = targetPoint.x - popupWidth / 2;
+                    const targetY = targetPoint.y - popupHeight / 2;
+                    
+                    popup.style.left = `${targetX}px`;
+                    popup.style.top = `${targetY}px`;
+                }, index * 20);
             });
-          }
 
-          // 第二波：延迟300ms再炸一波（150朵花），爆炸范围更大
-          setTimeout(() => {
-            for (let i = 0; i < 150; i++) {
-              const angle = Math.random() * Math.PI * 2;
-              const speed = 2 + Math.random() * 5; // 降低初始速度（原3+6）
-              const color =
-                flowerColors[Math.floor(Math.random() * flowerColors.length)];
-              const size = 7 + Math.random() * 5;
-              const petalCount = 6 + Math.floor(Math.random() * 3);
-
-              flowers.push({
-                x: centerX,
-                y: centerY,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                color: color,
-                alpha: 0.9,
-                decay: 0.0015 + Math.random() * 0.001, // 减慢衰减（原0.004+0.002）
-                size: size,
-                petalCount: petalCount,
-                rotateSpeed: (Math.random() - 0.5) * 0.01, // 减慢旋转速度
-              });
-            }
-          }, 300);
-        }
-
-        // 绘制多瓣花朵（核心优化：更逼真的花朵形态）
-        function drawFlower(
-          ctx,
-          x,
-          y,
-          size,
-          color,
-          alpha,
-          petalCount,
-          rotateAngle
-        ) {
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate(rotateAngle); // 花朵旋转，更自然
-          ctx.globalAlpha = alpha;
-
-          const petalSize = size * 0.6; // 花瓣大小
-          const centerSize = size * 0.3; // 花蕊大小
-
-          // 绘制花瓣（多瓣环绕）
-          for (let i = 0; i < petalCount; i++) {
-            const angle = (i / petalCount) * Math.PI * 2;
-            ctx.save();
-            ctx.rotate(angle);
-
-            // 绘制单个花瓣（椭圆+圆弧，更饱满）
-            ctx.beginPath();
-            ctx.ellipse(
-              petalSize * 0.5,
-              0,
-              petalSize,
-              petalSize * 0.7,
-              0,
-              0,
-              Math.PI * 2
-            );
-            ctx.fillStyle = color.petal;
-            ctx.fill();
-
-            ctx.restore();
-          }
-
-          // 绘制花蕊（中心圆点，颜色更深）
-          ctx.beginPath();
-          ctx.arc(0, 0, centerSize, 0, Math.PI * 2);
-          ctx.fillStyle = color.center;
-          ctx.fill();
-
-          ctx.restore();
-        }
-
-        // 花朵动画循环（自然飘落效果）- 减慢下落速度，延长动画时长
-        function animateFlowers() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          flowers.forEach((flower, index) => {
-            // 花朵运动：降低重力，减慢下落速度（原0.04）
-            flower.vy += 0.02; // 重力减半，下落更缓慢
-            flower.vx += (Math.random() - 0.5) * 0.03; // 减少左右摆动幅度（原0.05），更平稳
-            flower.x += flower.vx;
-            flower.y += flower.vy;
-            flower.alpha -= flower.decay; // 衰减速度已减慢
-            flower.rotateAngle = (flower.rotateAngle || 0) + flower.rotateSpeed; // 旋转速度已减慢
-
-            // 绘制花朵
-            drawFlower(
-              ctx,
-              flower.x,
-              flower.y,
-              flower.size,
-              flower.color,
-              flower.alpha,
-              flower.petalCount,
-              flower.rotateAngle
-            );
-
-            // 移除消失的花朵（增加底部阈值，让花朵多停留一会儿）
-            if (flower.alpha <= 0 || flower.y > canvas.height + flower.size * 2) {
-              flowers.splice(index, 1);
-            }
-          });
-
-          // 持续动画直到所有花朵消失（总时长约5秒，和爱心同步）
-          if (flowers.length > 0) {
-            animationFrameId = requestAnimationFrame(animateFlowers);
-          } else {
-            cancelAnimationFrame(animationFrameId);
+            // 汇聚完成后显示中心文字
             setTimeout(() => {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              onComplete && onComplete(); // 花朵动画结束，执行回调显示小男孩
-            }, 500);
-          }
+                heartCenterText.style.opacity = 1;
+            }, popups.length * 20 + 2000);
         }
 
-        createFlowers();
-        animateFlowers();
-        setTimeout(() => {
-          boyScene.classList.add("show");
-          // 文字显示2秒后，开始消失并生成爱心
-          setTimeout(() => {
-            happyText.classList.add("fade-out");
-            generateHearts(); // 生成小爱心飘落（和花朵同步）
-          }, 2000);
-        }, 1000);
-      }
+        // 完整流程
+        function startProcess() {
+            document.getElementById("guidePopup").style.display = "none";
+            popups = [];
+            
+            // 更新中心坐标
+            updateCenter();
 
-      // 生成小爱心并自然飘落（微调时长，和花朵同步）
-      function generateHearts() {
-        const heartCount = 200; // 爱心数量不变
-        const textRect = happyText.getBoundingClientRect();
-        const textCenterX = textRect.left + textRect.width / 2;
-        const textCenterY = textRect.top + textRect.height / 2;
-
-        // 生成单个爱心
-        function createHeart() {
-          const heart = document.createElement("div");
-          heart.style.position = "absolute";
-          heart.style.fontSize = `${8 + Math.random() * 6}px`; // 爱心大小随机
-          heart.style.color = heartColors[Math.floor(Math.random() * heartColors.length)];
-          heart.style.opacity = "0";
-          heart.style.transition = "opacity 0.5s ease";
-          heart.textContent = "💓"; // 爱心emoji，清晰不模糊
-
-          // 爱心初始位置：文字范围内随机
-          const initX = textCenterX - 50 + Math.random() * 100;
-          const initY = textCenterY - 20 + Math.random() * 40;
-          heart.style.left = `${initX}px`;
-          heart.style.top = `${initY}px`;
-
-          heartsContainer.appendChild(heart);
-
-          // 爱心动画：先显示，再自然飘落（时长调整为4.5-6秒，和花朵呼应）
-          setTimeout(() => {
-            heart.style.opacity = "1"; // 渐显
-
-            // 飘落动画（微调参数，和花朵同步结束）
-            const fallDuration = 4.5 + Math.random() * 1.5; // 延长飘落时长（原3+2）
-            const swingAmplitude = 8 + Math.random() * 12; // 减少摆动幅度（原10+15），更平稳
-            const rotateAngle = Math.random() * 360; // 随机旋转角度
-            const speedY = 8 + Math.random() * 6; // 减慢下落速度（原10+8）
-
-            let startTime = null;
-            function animateHeart(timestamp) {
-              if (!startTime) startTime = timestamp;
-              const progress = (timestamp - startTime) / (fallDuration * 1000);
-
-              if (progress < 1) {
-                // 左右摆动（正弦曲线）
-                const swing = Math.sin(progress * Math.PI * 3) * swingAmplitude; // 减少摆动频率（原4）
-                // 下落位置
-                const currentY = initY + progress * speedY * 20;
-                // 旋转
-                heart.style.transform = `rotate(${rotateAngle * progress}deg)`;
-                // 更新位置
-                heart.style.left = `${initX + swing}px`;
-                heart.style.top = `${currentY}px`;
-                // 逐渐透明（保持和花朵衰减节奏一致）
-                heart.style.opacity = `${1 - progress * 0.7}`;
-
-                requestAnimationFrame(animateHeart);
-              } else {
-                // 动画结束，移除爱心
-                heart.remove();
-              }
+            // 增加卡片数量以适应更大的爱心
+            const screenSize = Math.min(window.innerWidth, window.innerHeight);
+            const cardCount = Math.min(150, Math.floor(screenSize / 2)); // 进一步增加卡片数量
+            
+            // 创建卡片
+            for (let i = 0; i < cardCount; i++) {
+                setTimeout(() => {
+                    const popup = createPopup();
+                    popups.push(popup);
+                }, i * 30);
             }
 
-            requestAnimationFrame(animateHeart);
-          }, Math.random() * 500); // 爱心分批出现，更自然
+            // 生成完毕后开始汇聚
+            const totalGenerateTime = cardCount * 30;
+            setTimeout(gatherToHeart, totalGenerateTime + 800);
         }
 
-        // 批量生成爱心
-        for (let i = 0; i < heartCount; i++) {
-          setTimeout(createHeart, i * 10);
-        }
-      }
-
-      // 完整流程：引导→生成→聚集→同步爆炸→显示小男孩→文字消失→爱心飘落
-      function startPopup() {
-        document.getElementById("guidePopup").style.display = "none";
-        popups = [];
-
-        // 生成100个弹窗（优化数量，避免手机卡顿）
-        const windowCount = 160;
-        for (let i = 0; i < windowCount; i++) {
-          setTimeout(() => {
-            const popup = createPopup();
-            popups.push(popup);
-          }, i * 70);
-        }
-
-        const totalGenerateTime = windowCount * 70; // 10秒生成完所有弹窗
-        setTimeout(gatherPopups, totalGenerateTime + 800); // 生成后延迟0.8秒开始聚集
-        setTimeout(syncExplode, totalGenerateTime + 800 + 1800); // 聚集1.8秒后，同步触发爆炸
-      }
-
-      // 绑定按钮事件（确保手机端点击有效）
-      document.addEventListener("DOMContentLoaded", () => {
-        const startBtn = document.getElementById("startBtn");
-        startBtn.addEventListener("click", startPopup);
-        startBtn.addEventListener("touchstart", (e) => {
-          e.preventDefault();
-          startPopup();
+        // 绑定按钮事件
+        document.addEventListener("DOMContentLoaded", () => {
+            updateCenter();
+            
+            const startBtn = document.getElementById("startBtn");
+            startBtn.addEventListener("click", startProcess);
+            startBtn.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                startProcess();
+            });
         });
-      });
-    </script>
-  </body>
-</html>
 
+        // 窗口缩放时重新调整
+        window.addEventListener("resize", () => {
+            updateCenter();
+            
+            if (popups.length > 0 && document.getElementById("guidePopup").style.display === "none") {
+                gatherToHeart();
+            }
+        });
+    </script>
+</body>
+</html>
