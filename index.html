@@ -84,7 +84,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 22px;
+            font-size: 26px;
             color: #ff6b8f;
             opacity: 0;
             transition: opacity 1.5s ease;
@@ -163,11 +163,11 @@
             centerY = window.innerHeight / 2;
         }
 
-        // 生成爱心坐标 - 带随机偏移和旋转
+        // 生成爱心坐标 - 放大爱心
         function generateHeartPoints(count) {
             const points = [];
             const screenSize = Math.min(window.innerWidth, window.innerHeight);
-            const heartSize = screenSize * 0.25;
+            const heartSize = screenSize * 0.35; // 增大爱心尺寸到35%
             
             // 生成基础爱心形状
             for (let t = 0; t < 2 * Math.PI; t += 2 * Math.PI / count) {
@@ -178,8 +178,8 @@
                 const scaledY = centerY - y * heartSize / 16;
                 
                 // 添加随机偏移，使爱心边缘不规则
-                const randomOffsetX = (Math.random() - 0.5) * 12;
-                const randomOffsetY = (Math.random() - 0.5) * 12;
+                const randomOffsetX = (Math.random() - 0.5) * 15;
+                const randomOffsetY = (Math.random() - 0.5) * 15;
                 
                 // 随机旋转角度（-25度到25度）
                 const rotation = (Math.random() - 0.5) * 50;
@@ -214,7 +214,7 @@
             popup.style.transform = 'rotate(0deg)';
             popup.style.left = `${x}px`;
             popup.style.top = `${y}px`;
-            popup.style.animation = "fadeIn 0.5s ease-out";
+            popup.style.animation = "fadeIn 0.8s ease-out";
 
             document.body.appendChild(popup);
             return popup;
@@ -228,18 +228,18 @@
                 const targetPoint = heartPoints[index];
                 
                 // 随机延迟，使汇聚更有层次感
-                const randomDelay = Math.random() * 400;
+                const randomDelay = Math.random() * 600;
                 
                 setTimeout(() => {
                     // 在移动到目标位置的同时缩小卡片并添加旋转
-                    popup.style.transition = 'all 2.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
-                    popup.style.padding = '5px 8px';
-                    popup.style.fontSize = '9px';
-                    popup.style.borderRadius = '6px';
-                    popup.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                    popup.style.transition = 'all 3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    popup.style.padding = '6px 10px';
+                    popup.style.fontSize = '10px';
+                    popup.style.borderRadius = '8px';
+                    popup.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.1)';
                     
-                    const popupWidth = 60;
-                    const popupHeight = 25;
+                    const popupWidth = 70;
+                    const popupHeight = 30;
                     
                     const targetX = targetPoint.x - popupWidth / 2;
                     const targetY = targetPoint.y - popupHeight / 2;
@@ -247,12 +247,12 @@
                     // 应用位置和旋转（只在汇聚时添加旋转）
                     popup.style.left = `${targetX}px`;
                     popup.style.top = `${targetY}px`;
-                    popup.style.transform = `rotate(${targetPoint.rotation}deg) scale(0.8)`;
+                    popup.style.transform = `rotate(${targetPoint.rotation}deg) scale(0.85)`;
                     
-                }, index * 25 + randomDelay);
+                }, index * 35 + randomDelay);
             });
 
- 
+           
         }
 
         // 完整流程
@@ -263,18 +263,18 @@
             updateCenter();
 
             const screenSize = Math.min(window.innerWidth, window.innerHeight);
-            const cardCount = Math.min(150, Math.floor(screenSize / 3));
+            const cardCount = Math.min(150, Math.floor(screenSize / 2)); // 增加卡片数量以适应更大的爱心
             
-            // 创建卡片（保持整齐）
+            // 创建卡片（保持整齐）- 减慢生成速度
             for (let i = 0; i < cardCount; i++) {
                 setTimeout(() => {
                     const popup = createPopup();
                     popups.push(popup);
-                }, i * 40);
+                }, i * 70); // 减慢生成速度：从40ms增加到80ms
             }
 
-            const totalGenerateTime = cardCount * 40;
-            setTimeout(gatherToHeart, totalGenerateTime + 1000);
+            const totalGenerateTime = cardCount * 80;
+            setTimeout(gatherToHeart, totalGenerateTime + 1200);
         }
 
         // 绑定按钮事件
